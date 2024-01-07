@@ -1,5 +1,5 @@
 class Record {
-  final num id;
+  final int id;
   final double liter;
   final double distance;
   final double baht;

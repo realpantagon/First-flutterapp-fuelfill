@@ -51,7 +51,7 @@ class _recordState extends State<recordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       appBar: recordbar(),
       body: Column(
         children: [datetime(), Input(), addbut()],
@@ -66,23 +66,30 @@ class _recordState extends State<recordScreen> {
         alignment: Alignment.topCenter,
         child: ElevatedButton(
           onPressed: () async {
-            // print(literController.text);
-
             final liter = double.parse(literController.value.text);
             final distance = double.parse(distanceController.value.text);
             final money = double.parse(moneyController.value.text);
-            final id = double.parse(priceController.value.text);
-            // final datetime = DateTime(date.day, date.month, date.year, date.hour, date.minute);
+            final id = new DateTime.now().millisecondsSinceEpoch;
+
+            final DateTime combinedDateTime = DateTime(
+            date.year,
+            date.month,
+            date.day,
+            time.hour,
+            time.minute,
+          );
+
 
             final Record model = Record(
                 id: id,
                 liter: liter,
                 distance: distance,
-                datetime: dateTime,
+                datetime: combinedDateTime,
                 baht: money);
             await DatabaseHelper.addRecord(model);
 
-            print('${date.day},${date.month},${date.year},${date.hour},${date.minute}');
+            print(
+                '${date.day},${date.month},${date.year},${date.hour},${date.minute}');
             Navigator.pop(context);
           },
           child: const Text('Add Record'),
@@ -107,14 +114,20 @@ class _recordState extends State<recordScreen> {
           Expanded(
             flex: 2,
             child: TextFormField(
+              onTapOutside: (Event){
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
               decoration: InputDecoration(
-                  labelText: label,
-                  suffixText: suffixText,
-                  enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                          width: 3,
-                          color: Color.fromARGB(255, 120, 110, 255)))),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                // labelText: label,
+                suffixText: suffixText,
+                enabledBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                      width: 3,
+                      color: Color.fromARGB(255, 167, 167, 167)),
+                ),
+              ),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),
               ],
@@ -205,7 +218,8 @@ class _recordState extends State<recordScreen> {
                           setState(() => time = newDate);
                         },
                       ),
-                    ))
+                    ),
+                    )
           ],
         ),
       ),
@@ -221,7 +235,7 @@ class _recordState extends State<recordScreen> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      backgroundColor: const Color.fromARGB(255, 199, 197, 255),
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
     );
   }
 }

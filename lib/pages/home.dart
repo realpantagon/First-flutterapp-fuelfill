@@ -1,8 +1,3 @@
-// ignore_for_file: sort_child_properties_last, must_be_immutable
-
-// import 'package:flutter/foundation.dart';
-// import 'dart:html';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -45,16 +40,20 @@ class _HomePageState extends State<HomePage> {
       spaceBetweenChildren: 20,
       children: [
         SpeedDialChild(
-            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-            child: const Icon(Icons.receipt_long_rounded),
-            label: 'Add Record',
-            onTap: () {
-              Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const recordScreen()))
-                  .then((value) => setState(() {}));
-            }),
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          child: const Icon(Icons.receipt_long_rounded),
+          label: 'Add Record',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const recordScreen(),
+              ),
+            ).then(
+              (value) => setState(() {}),
+            );
+          },
+        ),
         // SpeedDialChild(
         //     backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         //     child: const Icon(Icons.car_repair_rounded),
@@ -83,6 +82,9 @@ class _HomePageState extends State<HomePage> {
           );
         } else {
           List<Record> records = (snapshot.data as List<Record>);
+          records.sort(
+            (a, b) => b.datetime.compareTo(a.datetime),
+          );
           return Expanded(
             child: ListView.builder(
               itemCount: records.length,
@@ -103,12 +105,22 @@ class _HomePageState extends State<HomePage> {
                       width: 100,
                       child: Row(
                         children: [
-                          // IconButton(
-                          //   onPressed: ()=>DatabaseHelper.updateRecord(record),
-                          //   icon: Icon(Icons.edit_note_outlined),
-                          // ),
                           IconButton(
-                            onPressed: () => {
+                            onPressed: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => recordScreen(
+                                    record: record,
+                                  ),
+                                ),
+                              );
+                              setState(() {});
+                            },
+                            icon: const Icon(Icons.edit_note_outlined),
+                          ),
+                          IconButton(
+                            onPressed: () async => {
                               showCupertinoDialog(
                                   context: context,
                                   builder: (BuildContext context) {
@@ -125,7 +137,10 @@ class _HomePageState extends State<HomePage> {
                                           onPressed: () {
                                             DatabaseHelper.deleteRecord(record)
                                                 .then(
-                                                    (value) => setState(() {})).then((value) => Navigator.of(context).pop());
+                                                    (value) => setState(() {}))
+                                                .then((value) =>
+                                                    Navigator.of(context)
+                                                        .pop());
                                           },
                                         ),
                                       ],

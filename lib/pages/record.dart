@@ -25,9 +25,30 @@ class _recordState extends State<recordScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize date and time with the current date and time
-    date = DateTime.now();
-    time = DateTime.now();
+
+    if (widget.record != null) {
+      moneyController.text = widget.record!.baht.toString();
+      literController.text = widget.record!.liter.toString();
+      priceController.text = calculateOilPrice(
+        widget.record!.baht,
+        widget.record!.liter,
+      ).toString();
+      distanceController.text = widget.record!.distance.toString();
+      dateTime = widget.record!.datetime;
+    } else {
+      dateTime = DateTime.now();
+    }
+    // date = DateTime.now();
+    // time = DateTime.now();
+  }
+
+  String calculateOilPrice(double baht, double liter) {
+    if (liter != 0) {
+      double oilPrice = baht / liter;
+      return oilPrice.toStringAsFixed(2);
+    } else {
+      return "0.0"; // Handle division by zero or other cases
+    }
   }
 
   void _showDialog(Widget child) {
@@ -53,8 +74,10 @@ class _recordState extends State<recordScreen> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
       appBar: recordbar(),
-      body: Column(
-        children: [datetime(), Input(), addbut()],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [datetime(), Input(), addbut()],
+        ),
       ),
     );
   }
@@ -66,31 +89,28 @@ class _recordState extends State<recordScreen> {
         alignment: Alignment.topCenter,
         child: ElevatedButton(
           onPressed: () async {
-            final liter = double.parse(literController.value.text);
-            final distance = double.parse(distanceController.value.text);
-            final money = double.parse(moneyController.value.text);
-            final id = new DateTime.now().millisecondsSinceEpoch;
+            if (widget.record != null) {
+              final updateRecord = Record(
+                  id: widget.record!.id,
+                  liter: double.parse(literController.text),
+                  distance: double.parse(distanceController.text),
+                  baht: double.parse(moneyController.text),
+                  datetime: dateTime);
+              await DatabaseHelper.updateRecord(updateRecord)
+                  .then((value) => {setState(() {})});
+              Navigator.pop(context, true);
+            } else {
+              final addnewReocrd = Record(
+                  id: new DateTime.now().millisecondsSinceEpoch,
+                  liter: double.parse(literController.value.text),
+                  distance: double.parse(distanceController.value.text),
+                  baht: double.parse(moneyController.value.text),
+                  datetime: dateTime);
+              await DatabaseHelper.addRecord(addnewReocrd)
+                  .then((value) => {setState(() {})});
 
-            final DateTime combinedDateTime = DateTime(
-            date.year,
-            date.month,
-            date.day,
-            time.hour,
-            time.minute,
-          );
-
-
-            final Record model = Record(
-                id: id,
-                liter: liter,
-                distance: distance,
-                datetime: combinedDateTime,
-                baht: money);
-            await DatabaseHelper.addRecord(model);
-
-            print(
-                '${date.day},${date.month},${date.year},${date.hour},${date.minute}');
-            Navigator.pop(context);
+              Navigator.pop(context, true);
+            }
           },
           child: const Text('Add Record'),
         ),
@@ -114,7 +134,7 @@ class _recordState extends State<recordScreen> {
           Expanded(
             flex: 2,
             child: TextFormField(
-              onTapOutside: (Event){
+              onTapOutside: (Event) {
                 FocusManager.instance.primaryFocus?.unfocus();
               },
               decoration: InputDecoration(
@@ -122,8 +142,7 @@ class _recordState extends State<recordScreen> {
                 suffixText: suffixText,
                 enabledBorder: const OutlineInputBorder(
                   borderSide: BorderSide(
-                      width: 3,
-                      color: Color.fromARGB(255, 167, 167, 167)),
+                      width: 3, color: Color.fromARGB(255, 167, 167, 167)),
                 ),
               ),
               keyboardType:
@@ -203,23 +222,23 @@ class _recordState extends State<recordScreen> {
                       ),
                     )),
             CupertinoButton(
-                // color: Color.fromARGB(255, 167, 171, 255),
-                child: Text(
-                  '${time.hour}-${time.minute}',
-                  style: const TextStyle(fontSize: 14),
+              // color: Color.fromARGB(255, 167, 171, 255),
+              child: Text(
+                '${time.hour}-${time.minute}',
+                style: const TextStyle(fontSize: 14),
+              ),
+              onPressed: () => _showDialog(
+                CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.time,
+                  use24hFormat: true,
+                  showDayOfWeek: true,
+                  initialDateTime: time,
+                  onDateTimeChanged: (DateTime newDate) {
+                    setState(() => time = newDate);
+                  },
                 ),
-                onPressed: () => _showDialog(
-                      CupertinoDatePicker(
-                        mode: CupertinoDatePickerMode.time,
-                        use24hFormat: true,
-                        showDayOfWeek: true,
-                        initialDateTime: time,
-                        onDateTimeChanged: (DateTime newDate) {
-                          setState(() => time = newDate);
-                        },
-                      ),
-                    ),
-                    )
+              ),
+            )
           ],
         ),
       ),

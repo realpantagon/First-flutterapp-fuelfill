@@ -42,7 +42,6 @@ class DatabaseHelper {
     double totalLiter = 0.0;
     double totalExpense = 0.0;
 
-
     if (type == 'Distance') {
       List<Map<String, dynamic>> result = await db
           .rawQuery('SELECT SUM(distance) as totalDistance FROM record');
@@ -61,12 +60,11 @@ class DatabaseHelper {
     } else if (type == 'BpL') {
       double money = await getsum('Money');
       double liter = await getsum('Liter');
-      return liter != 0? money/liter: 0.0;
+      return liter != 0 ? money / liter : 0.0;
     } else if (type == 'BpD') {
+      double money = await getsum('Money');
       double distance = await getsum('Distance');
-      double liter = await getsum('Liter');
-      return liter != 0? distance/liter: 0.0;
-
+      return distance != 0 ? money / distance : 0.0;
     } else {
       return 0.0;
     }

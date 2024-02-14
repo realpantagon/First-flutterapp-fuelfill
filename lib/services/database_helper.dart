@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -24,7 +23,7 @@ class DatabaseHelper {
         ''');
 
         // Create the 'car' table
-        await db.execute('''l
+        await db.execute('''
           CREATE TABLE car (
             name TEXT PRIMARY KEY,
             oiltype TEXT NOT NULL,
@@ -77,11 +76,11 @@ class DatabaseHelper {
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  static Future<int> addCar(Car car) async {
-    final db = await _getDB();
-    return await db.insert("car", car.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
-  }
+  // static Future<int> addCar(Car car) async {
+  //   final db = await _getDB();
+  //   return await db.insert("car", car.toJson(),
+  //       conflictAlgorithm: ConflictAlgorithm.replace);
+  // }
 
 // update
   static Future<int> updateRecord(Record record) async {

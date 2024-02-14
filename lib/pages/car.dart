@@ -17,7 +17,7 @@ class _carState extends State<car> {
 
   AppBar carbar() {
     return AppBar(
-      title: Text(
+      title: const Text(
         'Select car',
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),

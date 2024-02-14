@@ -4,6 +4,7 @@ import 'package:fuelfill/models/model_Data.dart';
 import 'package:fuelfill/services/database_helper.dart';
 import 'package:flutter/cupertino.dart';
 
+// ignore: camel_case_types
 class recordScreen extends StatefulWidget {
   final Record? record;
   const recordScreen({Key? key, this.record}) : super(key: key);
@@ -12,6 +13,7 @@ class recordScreen extends StatefulWidget {
   State<recordScreen> createState() => _recordState();
 }
 
+// ignore: camel_case_types
 class _recordState extends State<recordScreen> {
   final moneyController = TextEditingController();
   final literController = TextEditingController();
@@ -21,7 +23,7 @@ class _recordState extends State<recordScreen> {
 
   late DateTime date = DateTime.now();
   late DateTime time = DateTime.now();
-
+  
   @override
   void initState() {
     super.initState();
@@ -38,8 +40,16 @@ class _recordState extends State<recordScreen> {
     } else {
       dateTime = DateTime.now();
     }
-    // date = DateTime.now();
-    // time = DateTime.now();
+  }
+
+
+  String calculateOilAmount(double oilprice, double baht) {
+    if (oilprice != 0) {
+      double amount = baht/oilprice;
+      return amount.toStringAsFixed(2);
+    } else {
+      return "0.0";
+    }
   }
 
   String calculateOilPrice(double baht, double liter) {
@@ -47,7 +57,7 @@ class _recordState extends State<recordScreen> {
       double oilPrice = baht / liter;
       return oilPrice.toStringAsFixed(2);
     } else {
-      return "0.0"; // Handle division by zero or other cases
+      return "0.0";
     }
   }
 
@@ -72,15 +82,17 @@ class _recordState extends State<recordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      backgroundColor:const Color.fromARGB(255, 255, 255, 255),
       appBar: recordbar(),
       body: SingleChildScrollView(
         child: Column(
-          children: [datetime(), Input(), addbut()],
+          children: [datetime(), input(), addbut()],
         ),
       ),
     );
   }
+
+
 
   Container addbut() {
     return Container(
@@ -134,7 +146,7 @@ class _recordState extends State<recordScreen> {
           Expanded(
             flex: 2,
             child: TextFormField(
-              onTapOutside: (Event) {
+              onTapOutside: (event) {
                 FocusManager.instance.primaryFocus?.unfocus();
               },
               decoration: InputDecoration(
@@ -166,7 +178,7 @@ class _recordState extends State<recordScreen> {
     );
   }
 
-  Container Input() {
+  Container input() {
     return Container(
       padding: const EdgeInsets.only(left: 30, top: 5),
       child: Column(
@@ -254,7 +266,7 @@ class _recordState extends State<recordScreen> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
     );
   }
 }

@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:fuelfill/pages/car.dart';
 import 'package:fuelfill/pages/record.dart';
 import 'package:fuelfill/services/database_helper.dart';
 import 'package:fuelfill/models/model_Data.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
   SpeedDial Menu(BuildContext context) {
     return SpeedDial(
       animatedIcon: AnimatedIcons.menu_close,
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Colors.white,
       activeBackgroundColor: const Color.fromARGB(255, 242, 242, 242),
       overlayColor: Colors.black,
       overlayOpacity: 0.4,
@@ -93,7 +93,7 @@ class _HomePageState extends State<HomePage> {
                 return Padding(
                   padding: const EdgeInsets.all(2),
                   child: ListTile(
-                    tileColor: const Color.fromARGB(255, 244, 244, 244),
+                    tileColor: Color.fromARGB(255, 251, 251, 251),
                     dense: true,
                     title: Text(
                       'Liter: ${record.liter}, Distance: ${record.distance}, Baht: ${record.baht}',
@@ -117,37 +117,85 @@ class _HomePageState extends State<HomePage> {
                               );
                               setState(() {});
                             },
-                            icon: const Icon(Icons.edit_note_outlined),
+                            icon: Icon(
+                              Icons.edit_note_outlined,
+                              color: Colors.lightBlue.shade400,
+                            ),
                           ),
                           IconButton(
                             onPressed: () async => {
-                              showCupertinoDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return CupertinoAlertDialog(
-                                      title: const Text('Confirm Delete'),
-                                      content: const Text('Delete this record'),
-                                      actions: <Widget>[
-                                        CupertinoDialogAction(
-                                            child: const Text('No'),
-                                            onPressed: () =>
-                                                {Navigator.of(context).pop()}),
-                                        CupertinoDialogAction(
-                                          child: const Text('Yes'),
-                                          onPressed: () {
-                                            DatabaseHelper.deleteRecord(record)
-                                                .then(
-                                                    (value) => setState(() {}))
-                                                .then((value) =>
-                                                    Navigator.of(context)
-                                                        .pop());
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  })
+                              if (Platform.isIOS)
+                                {
+                                  showCupertinoDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return CupertinoAlertDialog(
+                                          title: const Text('Confirm Delete'),
+                                          content:
+                                              const Text('Delete this record'),
+                                          actions: <Widget>[
+                                            CupertinoDialogAction(
+                                                child: const Text('No'),
+                                                onPressed: () => {
+                                                      Navigator.of(context)
+                                                          .pop()
+                                                    }),
+                                            CupertinoDialogAction(
+                                              isDestructiveAction: true,
+                                              child: const Text('Delete'),
+                                              onPressed: () {
+                                                DatabaseHelper.deleteRecord(
+                                                        record)
+                                                    .then((value) =>
+                                                        setState(() {}))
+                                                    .then((value) =>
+                                                        Navigator.of(context)
+                                                            .pop());
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      })
+                                }
+                              else
+                                {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('confirm Delete'),
+                                          content: const Text(
+                                              'Are you sure you want to delete this record?'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                                onPressed: () => {
+                                                      Navigator.of(context)
+                                                          .pop()
+                                                    },
+                                                child: const Text('No')),
+                                            TextButton(
+                                                onPressed: () {
+                                                  DatabaseHelper.deleteRecord(
+                                                          record)
+                                                      .then((value) =>
+                                                          setState(() {}))
+                                                      .then((value) =>
+                                                          Navigator.of(context)
+                                                              .pop());
+                                                },
+                                                style: TextButton.styleFrom(
+                                                  foregroundColor:Colors.red.shade500 
+                                                ),
+                                                child: const Text('Delete'),)
+                                          ],
+                                        );
+                                      })
+                                }
                             },
-                            icon: const Icon(Icons.delete_forever_outlined),
+                            icon: Icon(
+                              Icons.delete_forever_outlined,
+                              color: Colors.red.shade300,
+                            ),
                           ),
                         ],
                       ),
@@ -162,7 +210,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Expanded showinsight(String label, String icon, String type) {
+  Expanded showinsight(String label, String type) {
     return Expanded(
       child: FutureBuilder(
         future: DatabaseHelper.getsum(type),
@@ -213,9 +261,9 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               const SizedBox(width: 5),
-              showinsight('Baht/Liter', 'hi', 'BpL'),
+              showinsight('Baht/Liter', 'BpL'),
               const SizedBox(width: 5),
-              showinsight('Baht/Km', '', 'BpD'),
+              showinsight('Baht/Km', 'BpD'),
               const SizedBox(width: 5),
             ],
           ),
@@ -226,9 +274,9 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               const SizedBox(width: 5),
-              showinsight('Total Expense', 'hi', 'Money'),
+              showinsight('Total Expense', 'Money'),
               const SizedBox(width: 5),
-              showinsight('Total Distance', 'hi', 'Distance'),
+              showinsight('Total Distance', 'Distance'),
               const SizedBox(width: 5),
             ],
           ),
